@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SABSTATION
+
+A premium, editorial-style e-commerce front end for a fashion accessories
+brand selling **Shoes, Bags, and Glasses**. Built with Next.js (App Router),
+TypeScript, Tailwind CSS v4, and Framer Motion.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Other scripts:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build   # production build
+npm run start   # run the production build
+npm run lint    # eslint
+```
 
-## Learn More
+## What's included
 
-To learn more about Next.js, take a look at the following resources:
+- **Pages**: Home, Shop All, Shoes/Bags/Glasses category pages, Product
+  detail, Cart, Checkout (UI only), About, Contact, Search (with a
+  no-results state), and a custom 404.
+- **Commerce**: 24 seeded products (8 per category) with colors, sizes
+  (shoes), pricing/sale pricing, stock status, and tags — see
+  `src/lib/products.ts`. Category/price/color/size filters, sorting, and
+  full-text search live in `src/components/ShopExperience.tsx` and
+  `src/lib/products.ts`.
+- **Cart**: React context (`src/context/CartContext.tsx`) persisted to
+  `localStorage`, with an animated slide-in drawer, quantity controls, and a
+  full cart page.
+- **Checkout**: a polished, validated checkout form. It is UI-only — no
+  payment provider is connected and no charges are made; this is stated
+  explicitly on the page.
+- **Motion**: Framer Motion powers the hero text reveal, category card and
+  product card hover states, the cart drawer, mobile menu, search overlay,
+  and a subtle route transition (`src/app/template.tsx`). All motion
+  respects `prefers-reduced-motion`.
+- **Product imagery**: `src/components/ProductImage.tsx` renders a real photo
+  from `/public/images/...` and automatically falls back to generated,
+  brand-colored placeholder art (`ProductVisual.tsx`) if that file hasn't
+  been added yet or fails to load — see **Adding real product photos** below.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+  app/            routes (App Router)
+  components/     reusable UI (Navbar, ProductCard, CartDrawer, etc.)
+  context/        CartContext (cart state + localStorage persistence)
+  lib/            product data, types, formatting helpers
+```
 
-## Deploy on Vercel
+## Product photos
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Each product's photo lives at `public/images/{category}/products/{01-08}/1.jpg`
+(position within its category matches `src/lib/products.ts`), and each
+category's homepage cover is at `public/images/{category}/cover/1.jpg`. The
+mapping is computed in `imagesFor()` in `src/lib/products.ts` — if a file is
+ever missing, `<ProductImage>` (`src/components/ProductImage.tsx`) falls back
+to the generated brand-colored placeholder art automatically, so there's
+never a broken image.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The current photos are a curated subset of a starter pack sourced from
+Unsplash (license permits commercial use). Most of that pack's shoe and bag
+photos showed a real, recognizable brand's logo (Nike, Gucci, Valentino,
+Ferragamo, Saucony, Ray-Ban, etc.), which would misrepresent SABSTATION's
+catalog as carrying those brands — those files were removed rather than
+wired in, so those product slots currently show the generated placeholder
+art instead. Kept: `bags/products/02, 03, 06` and `glasses/cover, 01, 02,
+03, 05, 06, 07`. Everything else (all of shoes except `03`, and the rest of
+bags/glasses) is waiting on a real, unbranded photo.
+
+To add more than one photo per product (for the card hover-swap and a fuller
+gallery), drop a `2.jpg` alongside `1.jpg` in the same folder and add it to
+the array `imagesFor()` returns.
+
+## Notes
+
+- No API keys or backend integrations are configured; cart/checkout state
+  is entirely client-side.
