@@ -1,16 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --color-ink: #0a0a0a;
-  --color-ink-soft: #171717;
-  --color-paper: #ffffff;
-  --color-cream: #f4f1ea;
-  --color-cream-dark: #e8e2d4;
-  --color-lime: #d7ff3f;
-  --color-lime-dim: #c2e832;
-  --color-orange: #ff5a1f;
-  --color-line: rgba(10, 10, 10, 0.1);
-  --color-charcoal: #1b1a17;
+  /* Warm black / deep charcoal base */
+  --color-ink: #0d0b09;
+  --color-ink-soft: #1a1613;
+  --color-paper: #fffdf9;
+  /* Ivory / warm beige surfaces */
+  --color-cream: #f7f2e7;
+  --color-cream-dark: #e6dcc6;
+  /* Muted bronze (primary accent) + soft brown (secondary accent) */
+  --color-lime: #b6905a;
+  --color-lime-dim: #9c7a48;
+  --color-orange: #8a5738;
+  --color-line: rgba(13, 11, 9, 0.1);
+  --color-charcoal: #1c1712;
 }
 
 @theme inline {
@@ -23,7 +26,7 @@
   --color-lime-dim: var(--color-lime-dim);
   --color-orange: var(--color-orange);
   --color-charcoal: var(--color-charcoal);
-  --font-display: var(--font-archivo);
+  --font-display: var(--font-serif);
   --font-sans: var(--font-inter);
   --animate-marquee: marquee 32s linear infinite;
   --animate-marquee-fast: marquee 20s linear infinite;

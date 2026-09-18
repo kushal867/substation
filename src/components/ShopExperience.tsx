@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { Category, Product } from "@/lib/types";
+import type { MotionCategory } from "@/lib/categoryMotion";
+import MotionBackground from "./motion/MotionBackground";
 import ProductFilters, { type FilterState } from "./ProductFilters";
 import ProductGrid from "./ProductGrid";
 import Reveal from "./Reveal";
@@ -34,6 +36,7 @@ export default function ShopExperience({
 
   const effectiveCategory = lockCategory ?? filters.category;
   const showSizes = effectiveCategory === "shoes";
+  const motionCategory: MotionCategory = effectiveCategory === "all" ? "default" : effectiveCategory;
 
   const availableColors = useMemo(() => {
     const map = new Map<string, string>();
@@ -82,39 +85,46 @@ export default function ShopExperience({
   }, [products, filters, lockCategory, showSizes]);
 
   return (
-    <div className="mx-auto max-w-[1600px] px-4 pb-24 pt-32 sm:px-6 lg:px-10">
-      <Reveal>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange">
-          {products.length} Products
-        </p>
-        <h1 className="mt-2 font-display text-4xl font-black uppercase tracking-tight sm:text-5xl lg:text-6xl">
-          {title}
-        </h1>
-        <p className="mt-3 max-w-xl text-ink/60">{subtitle}</p>
-      </Reveal>
+    <div>
+      <div className="relative isolate flex min-h-[42vh] items-end overflow-hidden bg-ink pt-24 text-cream sm:min-h-[46vh]">
+        <MotionBackground category={motionCategory} />
+        <div className="relative z-10 mx-auto w-full max-w-[1600px] px-4 pb-12 sm:px-6 lg:px-10">
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-lime">
+              {products.length} Products
+            </p>
+            <h1 className="mt-2 font-display text-4xl font-black uppercase tracking-tight sm:text-5xl lg:text-6xl">
+              {title}
+            </h1>
+            <p className="mt-3 max-w-xl text-cream/70">{subtitle}</p>
+          </Reveal>
+        </div>
+      </div>
 
-      <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-[240px_1fr]">
-        <aside>
-          <ProductFilters
-            showCategory={!lockCategory}
-            priceCeiling={priceCeiling}
-            availableColors={availableColors}
-            availableSizes={availableSizes}
-            showSizes={showSizes}
-            state={filters}
-            onChange={setFilters}
-            resultCount={filtered.length}
-          />
-        </aside>
-        <div>
-          {filtered.length > 0 ? (
-            <ProductGrid products={filtered} />
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-ink/20 py-24 text-center">
-              <p className="font-display text-xl font-bold">No products match those filters</p>
-              <p className="text-sm text-ink/50">Try widening your price range or clearing a filter.</p>
-            </div>
-          )}
+      <div className="mx-auto max-w-[1600px] px-4 pb-24 pt-12 sm:px-6 lg:px-10">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[240px_1fr]">
+          <aside>
+            <ProductFilters
+              showCategory={!lockCategory}
+              priceCeiling={priceCeiling}
+              availableColors={availableColors}
+              availableSizes={availableSizes}
+              showSizes={showSizes}
+              state={filters}
+              onChange={setFilters}
+              resultCount={filtered.length}
+            />
+          </aside>
+          <div>
+            {filtered.length > 0 ? (
+              <ProductGrid products={filtered} />
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-ink/20 py-24 text-center">
+                <p className="font-display text-xl font-bold">No products match those filters</p>
+                <p className="text-sm text-ink/50">Try widening your price range or clearing a filter.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

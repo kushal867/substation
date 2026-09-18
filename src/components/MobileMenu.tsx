@@ -63,6 +63,13 @@ export default function MobileMenu({ open, onClose, links, pathname }: MobileMen
                 </motion.li>
               ))}
             </ul>
+            <Link
+              href="/wishlist"
+              onClick={onClose}
+              className="mb-4 text-sm font-semibold uppercase tracking-widest text-ink/70"
+            >
+              Wishlist
+            </Link>
             <p className="text-xs uppercase tracking-widest text-ink/40">
               Free shipping over $150
             </p>

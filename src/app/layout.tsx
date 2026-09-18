@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Archivo, Inter } from "next/font/google";
+import { Bodoni_Moda, Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 
-const archivo = Archivo({
-  variable: "--font-archivo",
+const serif = Bodoni_Moda({
+  variable: "--font-serif",
   subsets: ["latin"],
-  weight: ["600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
 });
 
 const inter = Inter({
@@ -25,7 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${inter.variable} h-full antialiased`}
+      className={`${serif.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <Providers>{children}</Providers>

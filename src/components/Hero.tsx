@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
 import ProductImage from "./ProductImage";
+import MotionBackground from "./motion/MotionBackground";
 
 const LINES = ["MOVE DIFFERENT.", "CARRY CONFIDENCE.", "SEE CLEAR."];
 
@@ -11,7 +12,7 @@ const FLOATERS = [
     key: "shoes",
     href: "/shoes",
     image: "/images/shoes/cover/1.jpg",
-    hex: "#d7ff3f",
+    hex: "#b6905a",
     floatClass: "animate-float-a",
     className: "left-0 top-4 h-40 w-32 sm:h-52 sm:w-40 lg:h-60 lg:w-44",
   },
@@ -19,7 +20,7 @@ const FLOATERS = [
     key: "bags",
     href: "/bags",
     image: "/images/bags/cover/1.jpg",
-    hex: "#ff5a1f",
+    hex: "#a06a44",
     floatClass: "animate-float-b",
     className: "right-2 top-0 h-36 w-36 sm:h-44 sm:w-44 lg:h-52 lg:w-52",
   },
@@ -27,7 +28,7 @@ const FLOATERS = [
     key: "glasses",
     href: "/glasses",
     image: "/images/glasses/cover/1.jpg",
-    hex: "#c7cbd1",
+    hex: "#cdc5b4",
     floatClass: "animate-float-c",
     className: "bottom-0 left-1/4 h-28 w-40 sm:h-32 sm:w-48 lg:h-36 lg:w-56",
   },
@@ -64,40 +65,9 @@ export default function Hero() {
 
   return (
     <section className="bg-grain relative isolate flex min-h-[100svh] w-full flex-col overflow-hidden text-cream">
-      {/* Background */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(120% 90% at 15% 0%, #2a2416 0%, #0a0a0a 45%), linear-gradient(200deg, #1a1610 0%, #0a0a0a 55%, #14100c 100%)",
-          }}
-        />
-        <motion.div
-          className="absolute -left-32 top-[-12%] h-[480px] w-[480px] rounded-full bg-lime/25 blur-[130px]"
-          animate={shouldReduceMotion ? {} : { x: [0, 50, 0], y: [0, 30, 0] }}
-          transition={{ duration: 19, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute right-[-10%] top-1/4 h-[440px] w-[440px] rounded-full bg-orange/20 blur-[140px]"
-          animate={shouldReduceMotion ? {} : { x: [0, -40, 0], y: [0, -35, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-[-10%] left-1/3 h-[360px] w-[360px] rounded-full bg-amber-700/10 blur-[130px]"
-          animate={shouldReduceMotion ? {} : { x: [0, 30, 0], y: [0, -20, 0] }}
-          transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <div
-          className={`absolute inset-0 opacity-[0.35] ${shouldReduceMotion ? "" : "animate-grid-drift"}`}
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(244,241,234,0.06) 1px, transparent 1px), linear-gradient(to right, rgba(244,241,234,0.06) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-transparent" />
-      </div>
+      {/* Living background — continuous motion, never static */}
+      <MotionBackground category="default" showMotif={false} />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-transparent to-transparent" />
 
       <div
         className="relative z-10 mx-auto grid w-full max-w-[1600px] flex-1 grid-cols-1 items-center gap-10 px-4 pt-20 sm:px-8 sm:pt-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6 lg:px-14 lg:pt-24"
@@ -149,8 +119,17 @@ export default function Hero() {
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.75, duration: 0.6 }}
-            className="mt-6 max-w-md text-base text-cream/85 sm:text-lg"
+            transition={{ delay: 0.7, duration: 0.6 }}
+            className="mt-5 font-display text-lg italic text-cream/60 sm:text-xl"
+          >
+            For the ones who move different.
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+            className="mt-4 max-w-md text-base text-cream/85 sm:text-lg"
           >
             Premium shoes, bags, and eyewear built for people who move
             through the city like it owes them something.

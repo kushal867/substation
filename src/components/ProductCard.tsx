@@ -8,6 +8,7 @@ import { formatPrice } from "@/lib/format";
 import ProductImage from "./ProductImage";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { CATEGORY_MOTION } from "@/lib/categoryMotion";
 
 const TAG_LABEL: Record<string, string> = {
   new: "New",
@@ -30,6 +31,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const primaryColor = product.colors[0];
   const soldOut = product.stock === "out-of-stock";
   const wishlisted = isWishlisted(product.id);
+  const accent = CATEGORY_MOTION[product.category].accent;
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -133,6 +135,18 @@ export default function ProductCard({ product }: { product: Product }) {
             />
           </motion.svg>
         </motion.button>
+
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 z-20 h-px overflow-hidden opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        >
+          <motion.div
+            className="h-full w-1/2"
+            style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
+          />
+        </div>
 
         <div className="absolute inset-x-0 bottom-0 z-30 translate-y-full transition-transform duration-400 ease-out group-hover:translate-y-0 group-focus-within:translate-y-0">
           <button

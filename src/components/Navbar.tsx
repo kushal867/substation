@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import MobileMenu from "./MobileMenu";
 import SearchOverlay from "./SearchOverlay";
 import AccountMenu from "./AccountMenu";
@@ -22,6 +23,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const { itemCount, openDrawer } = useCart();
+  const { ids: wishlistIds } = useWishlist();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -109,6 +111,24 @@ export default function Navbar() {
               <SearchIcon />
             </button>
             <AccountMenu solid={solid} />
+            <Link
+              href="/wishlist"
+              aria-label={`Wishlist, ${wishlistIds.length} saved`}
+              className="relative hidden rounded-full p-2.5 transition-colors hover:bg-ink/10 sm:inline-flex"
+            >
+              <HeartIcon />
+              {wishlistIds.length > 0 && (
+                <motion.span
+                  key={wishlistIds.length}
+                  initial={{ scale: 0.4, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                  className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-lime px-1 text-[10px] font-bold text-ink"
+                >
+                  {wishlistIds.length}
+                </motion.span>
+              )}
+            </Link>
             <button
               type="button"
               aria-label={`Cart, ${itemCount} item${itemCount === 1 ? "" : "s"}`}
@@ -162,6 +182,18 @@ function SearchIcon() {
     <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <circle cx="11" cy="11" r="7" />
       <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path
+        d="M12 20s-7-4.35-9.5-8.5C.7 8.1 2.2 4.5 5.7 4A5 5 0 0 1 12 7a5 5 0 0 1 6.3-3c3.5.5 5 4.1 3.2 7.5C19 15.65 12 20 12 20Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
