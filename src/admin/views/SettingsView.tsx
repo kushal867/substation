@@ -52,7 +52,7 @@ function Row({ title, description, children }: { title: string; description?: st
 }
 
 export default function SettingsView() {
-  const { state, saveSettings, resetDemo } = useAdmin();
+  const { state, saveSettings, resetDemo, loadSampleData } = useAdmin();
   const toast = useToast();
   const confirm = useConfirm();
   usePageLoading(0);
@@ -91,11 +91,11 @@ export default function SettingsView() {
   const resetForm = () => { setD({ ...DEFAULT_SETTINGS }); setErr({}); toast.info("Form reset to defaults — click “Save changes” to apply."); };
 
   const wipe = async () => {
-    const ok = await confirm({ title: "Reset all demo data?", description: "Products, orders, customers, payments, zones and settings will be restored to the original sample data. Your edits in this browser will be lost.", confirmLabel: "Reset demo data" });
+    const ok = await confirm({ title: "Clear all data?", description: "Products, orders, customers, payments, delivery zones and settings will be erased from this browser, leaving an empty store.", confirmLabel: "Clear all data" });
     if (!ok) return;
     resetDemo();
     setD({ ...DEFAULT_SETTINGS });
-    toast.success("Demo data restored to the original sample set.");
+    toast.success("All data cleared. The store is now empty.");
   };
 
   const nav = [["store", "Store"], ["currency", "Currency"], ["inventory", "Inventory"], ["profile", "Profile"], ["dashboard", "Dashboard"], ["notifications", "Notifications"], ["theme", "Theme"], ["data", "Demo data"]];
@@ -162,8 +162,9 @@ export default function SettingsView() {
             </div>
           </Section>
 
-          <Section id="data" icon={<Database />} title="Demo data" description="Everything here is mock data stored in localStorage on this device.">
-            <Row title="Reset demo data" description="Restore the original products, orders, customers and settings."><Button variant="danger" size="sm" onClick={wipe}><RotateCcw className="h-3.5 w-3.5" />Reset</Button></Row>
+          <Section id="data" icon={<Database />} title="Demo data" description="Data lives in localStorage on this device only.">
+            <Row title="Load sample data" description="Fill the store with realistic mock products, orders, customers and payments."><Button size="sm" onClick={async () => { const ok = await confirm({ title: "Load sample data?", description: "This replaces everything currently in the admin with mock records.", confirmLabel: "Load sample data", tone: "primary" }); if (!ok) return; loadSampleData(); toast.success("Sample data loaded."); }}>Load sample</Button></Row>
+            <Row title="Clear all data" description="Erase every record and start with an empty store."><Button variant="danger" size="sm" onClick={wipe}><RotateCcw className="h-3.5 w-3.5" />Clear all</Button></Row>
           </Section>
         </div>
       </div>

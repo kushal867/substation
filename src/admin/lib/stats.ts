@@ -79,9 +79,3 @@ export function computeStats(state: AdminState, range: DateRange) {
 }
 export type Stats = ReturnType<typeof computeStats>;
 
-/** Deterministic pseudo-trend for metrics that have no historical data in the mock set. */
-export function mockDelta(seed: string, period: string) {
-  let h = 7;
-  for (const c of seed + period) h = (h * 33 + c.charCodeAt(0)) % 997;
-  return ((h % 240) - 80) / 10; // roughly -8% .. +16%
-}

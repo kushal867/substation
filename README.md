@@ -94,11 +94,11 @@ printable report) and Settings (theme, thresholds, reset demo data).
 
 - Open [http://localhost:3000/admin](http://localhost:3000/admin) after `npm run dev`.
 - No backend, database, auth or payment provider: all data is mock data from
-  `src/admin/data/seed.ts`, held in a shared React store
+  `src/admin/data/seed.ts` (loaded on demand), held in a shared React store
   (`src/admin/store/AdminStore.tsx`) so edits propagate to every page.
 - Demo changes persist in this browser's `localStorage` (key
-  `substation-admin-demo-v1`, no sensitive data). **Settings → Reset demo data**
-  restores the seed.
+  `substation-admin-demo-v2`, no sensitive data). The admin starts empty; use
+  **Settings → Load sample data** for mock records or **Clear all data** to wipe.
 - Layout: `src/admin/{components,views,hooks,lib,data,store}`; routes live in
   `src/app/admin`. The storefront moved into the `(store)` route group so the
   admin has its own layout without the storefront navbar/footer.

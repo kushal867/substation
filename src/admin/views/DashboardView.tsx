@@ -18,12 +18,12 @@ import { useDateRange } from "../hooks/useDateRange";
 import { usePageLoading } from "../hooks/usePageLoading";
 import { fmtDate, npr, nprCompact, num } from "../lib/format";
 import { orderTotal } from "../lib/range";
-import { computeStats, mockDelta, ORDER_STATUSES } from "../lib/stats";
+import { computeStats, ORDER_STATUSES } from "../lib/stats";
 import { variantLabel, variantStatus } from "../lib/selectors";
 import { useAdmin } from "../store/AdminStore";
 
 export default function DashboardView() {
-  const { state } = useAdmin();
+  const { state, loadSampleData } = useAdmin();
   const dr = useDateRange(String(state.settings.defaultPeriod) as "30");
   const initial = usePageLoading();
   const switching = useBriefLoading(dr.range.from.getTime() + dr.range.to.getTime());
@@ -64,7 +64,8 @@ export default function DashboardView() {
   const payTotal = payData.reduce((s, p) => s + p.amount, 0);
   const recent = state.orders.slice(0, 6);
   const customerName = (id: string) => state.customers.find((c) => c.id === id)?.name ?? "—";
-  const show = settings.showSparklines;
+  const show = settings.showSparklines && hasOrders;
+  const storeEmpty = state.products.length === 0 && state.orders.length === 0;
 
   return (
     <>
@@ -79,14 +80,26 @@ export default function DashboardView() {
           </>
         }
       />
+      {storeEmpty && (
+        <Card className="mb-5 border-dashed p-6">
+          <h2 className="text-base font-semibold">Your store is empty — let&apos;s set it up</h2>
+          <p className="mt-1 text-sm text-a-muted">Add your first product, set delivery fees, then orders and payments will appear here.</p>
+          <ol className="mt-4 grid gap-3 sm:grid-cols-3">
+            {[["1", "Review categories", "Shoes, Glasses and Bags are ready.", "/admin/categories"], ["2", "Add delivery zones", "Set fees per area.", "/admin/delivery-zones"], ["3", "Add a product", "With variants and stock.", "/admin/products?new=1"]].map(([n, t, d, h]) => (
+              <li key={n}><Link href={h} className="flex h-full gap-3 rounded-lg border border-a-line p-3 transition-colors hover:bg-a-subtle"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-a-accent-soft text-xs font-semibold text-a-accent">{n}</span><span><span className="block text-sm font-medium">{t}</span><span className="text-xs text-a-muted">{d}</span></span></Link></li>
+            ))}
+          </ol>
+          <Button className="mt-4" variant="soft" onClick={() => { loadSampleData(); }}>Or explore with sample data</Button>
+        </Card>
+      )}
       <div className="mb-5"><DateRangeFilter state={dr} /></div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard loading={loading} showSpark={show} label="Total Revenue" value={npr(stats.cur.revenue)} change={stats.change.revenue} hint={`vs ${periodWord}`} icon={<DollarSign />} spark={spark("revenue")} tone="#4f46e5" />
         <StatCard loading={loading} showSpark={show} label="Total Orders" value={num(stats.cur.all)} change={stats.change.orders} hint={`vs ${periodWord}`} icon={<ShoppingCart />} spark={spark("count")} tone="#0ea5e9" />
         <StatCard loading={loading} showSpark={show} label="Total Products" value={num(state.products.length)} change={stats.change.products} hint={`${stats.newProducts} added this period`} icon={<Package />} spark={series.map((b) => state.products.filter((p) => { const t = new Date(p.createdAt).getTime(); return t >= b.start && t <= b.end; }).length)} tone="#10b981" />
-        <StatCard loading={loading} showSpark={show} label="Low Stock Products" value={num(stats.lowCount)} change={mockDelta("low", dr.key)} invert hint={`vs ${periodWord}`} icon={<AlertTriangle />} tone="#f59e0b" />
-        <StatCard loading={loading} showSpark={show} label="Out of Stock Products" value={num(stats.outCount)} change={mockDelta("out", dr.key)} invert hint={`vs ${periodWord}`} icon={<PackageX />} tone="#f43f5e" />
+        <StatCard loading={loading} showSpark={show} label="Low Stock Products" value={num(stats.lowCount)} hint="need restocking soon" icon={<AlertTriangle />} tone="#f59e0b" />
+        <StatCard loading={loading} showSpark={show} label="Out of Stock Products" value={num(stats.outCount)} hint="currently unavailable" icon={<PackageX />} tone="#f43f5e" />
         <StatCard loading={loading} showSpark={show} label="Pending Payments" value={npr(stats.cur.pending)} change={stats.change.pending} invert hint={`vs ${periodWord}`} icon={<Wallet />} spark={series.map((b) => b.revenue - b.collected)} tone="#8b5cf6" />
       </div>
 
@@ -226,6 +239,7 @@ export default function DashboardView() {
               loading={initial}
               rows={recent}
               rowKey={(o) => o.id}
+              empty={<EmptyState icon={<ShoppingCart />} title="No orders yet" description="New orders will show up here." className="py-8" />}
               columns={[
                 { key: "n", header: "Order", render: (o) => <Link href={`/admin/orders?q=${o.number}`} className="font-medium text-a-accent hover:underline">{o.number}</Link> },
                 { key: "c", header: "Customer", render: (o) => customerName(o.customerId) },
@@ -238,7 +252,7 @@ export default function DashboardView() {
           </div>
         </Card>
       </div>
-      <p className="mt-6 text-center text-xs text-a-muted">Demo data — all figures are mock values kept in your browser.</p>
+      <p className="mt-6 text-center text-xs text-a-muted">Data is stored in this browser only.</p>
     </>
   );
 }

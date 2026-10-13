@@ -35,13 +35,13 @@ export function StatCard({ label, value, change, invert, icon, spark, tone = "#4
       </div>
       <div className="mt-3 flex items-end justify-between gap-3">
         <div className="text-xs">
-          {change !== undefined ? (
+          {change !== undefined && change !== 0 ? (
             <span className={clsx("inline-flex items-center gap-0.5 font-medium", good === undefined ? "text-a-muted" : good ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
               {up ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
               {Math.abs(change).toFixed(1)}%
             </span>
           ) : null}
-          <span className="ml-1 text-a-muted">{hint ?? "vs previous period"}</span>
+          <span className={change !== undefined && change !== 0 ? "ml-1 text-a-muted" : "text-a-muted"}>{hint ?? "vs previous period"}</span>
         </div>
         {showSpark && spark && spark.length > 1 && (
           <div className="h-8 w-20 shrink-0" aria-hidden>

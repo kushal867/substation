@@ -5,7 +5,7 @@ import type {
   AdminState, Category, Customer, DeliveryZone, Order, OrderStatus, PaymentMethod, PaymentTxn,
   Product, Settings, StockMovement, Variant,
 } from "../types";
-import { createSeed, DEFAULT_SETTINGS } from "../data/seed";
+import { createEmptySeed, createSampleSeed, DEFAULT_SETTINGS } from "../data/seed";
 import { uid } from "../lib/format";
 import { orderBalance, orderTotal } from "../lib/range";
 import { variantLabel } from "../lib/selectors";
@@ -14,7 +14,7 @@ import { variantLabel } from "../lib/selectors";
  * Demo-only persistence. Only mock store data and UI preferences are written to
  * localStorage — never credentials or anything sensitive. Reset from Settings.
  */
-const STORAGE_KEY = "substation-admin-demo-v1";
+const STORAGE_KEY = "substation-admin-demo-v2";
 
 type Action =
   | { type: "hydrate"; state: AdminState }
@@ -62,7 +62,9 @@ interface Actions {
   // misc
   saveSettings: (s: Settings) => void;
   markNotificationsRead: (ids: string[]) => void;
+  /** Wipes every record (empty store). */
   resetDemo: () => void;
+  loadSampleData: () => void;
 }
 
 interface Ctx extends Actions {
@@ -89,7 +91,7 @@ function derivePay(o: Order): Order["paymentStatus"] {
 }
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, undefined as unknown as AdminState, () => createSeed());
+  const [state, dispatch] = useReducer(reducer, undefined as unknown as AdminState, () => createEmptySeed());
   const [ready, setReady] = useState(false);
   const hydrated = useRef(false);
 
@@ -320,8 +322,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       markNotificationsRead: (ids) => patch((s) => ({ ...s, readNotifications: Array.from(new Set([...s.readNotifications, ...ids])) })),
       resetDemo: () => {
         try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
-        dispatch({ type: "reset", state: createSeed() });
+        dispatch({ type: "reset", state: createEmptySeed() });
       },
+      loadSampleData: () => dispatch({ type: "reset", state: { ...createSampleSeed(), settings: stateRef.current.settings } }),
     };
   }, [patch]);
 

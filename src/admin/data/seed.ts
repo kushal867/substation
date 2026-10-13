@@ -37,7 +37,17 @@ function rng(seed: number) {
 
 const DAY = 86_400_000;
 
-export function createSeed(now = new Date()): AdminState {
+/** Clean store: only the three base categories (they define variant fields). */
+export function createEmptySeed(): AdminState {
+  const base = createSampleSeed();
+  return {
+    products: [], orders: [], customers: [], payments: [], zones: [], movements: [], readNotifications: [],
+    categories: base.categories.filter((c) => ["cat_shoes", "cat_glasses", "cat_bags"].includes(c.id)),
+    settings: DEFAULT_SETTINGS,
+  };
+}
+
+export function createSampleSeed(now = new Date()): AdminState {
   const rand = rng(20240611);
   const pick = <T,>(a: T[]) => a[Math.floor(rand() * a.length)];
   const int = (a: number, b: number) => a + Math.floor(rand() * (b - a + 1));

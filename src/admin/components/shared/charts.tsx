@@ -30,7 +30,7 @@ export function ChartCard({ title, subtitle, actions, loading, empty, height = 2
         {loading ? (
           <div className="a-skeleton w-full rounded-lg" style={{ height }} />
         ) : empty ? (
-          <EmptyState icon={<BarChart3 />} title="No data for this selection" description="Try a longer date range or clear some filters." className="py-10" />
+          <EmptyState icon={<BarChart3 />} title="Nothing to show yet" description="Data for this period will appear here as orders come in." className="py-10" />
         ) : (
           <div style={{ height }}>{children}</div>
         )}
