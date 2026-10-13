@@ -29,7 +29,7 @@ function toDraft(p: Product | null, defaultCat: string): Draft {
   };
 }
 
-/** Downscale uploaded images so the demo's localStorage stays small. */
+/** Downscale uploaded images so they stay small in the database. Prefer an image URL for large photos. */
 function readImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();

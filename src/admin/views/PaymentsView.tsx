@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheck, CheckCircle2, Clock, CreditCard, Download, HandCoins, Hourglass, RotateCcw, ShieldCheck, Wallet, XCircle } from "lucide-react";
+import { BadgeCheck, CreditCard, Download, HandCoins, Hourglass, RotateCcw, ShieldCheck, Wallet, XCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { DateRangeFilter } from "../components/shared/DateRangeFilter";
 import { StatCard } from "../components/shared/StatCard";
@@ -27,20 +27,20 @@ function Detail({ txn, onClose }: { txn: PaymentTxn | null; onClose: () => void 
   const { state, verifyTxn } = useAdmin();
   const toast = useToast();
   const confirm = useConfirm();
-  const [step, setStep] = useState(-1);
-  useEffect(() => setStep(-1), [txn?.id]);
   if (!txn) return null;
   const live = state.payments.find((p) => p.id === txn.id) ?? txn;
   const order = state.orders.find((o) => o.id === live.orderId);
   const customer = state.customers.find((c) => c.id === order?.customerId);
-  const steps = ["Looking up reference", "Matching amount with order", "Confirming with (mock) gateway"];
 
   const verify = async () => {
-    setStep(0);
-    for (let i = 0; i < steps.length; i++) { setStep(i); await new Promise((r) => setTimeout(r, 550)); }
+    const ok = await confirm({
+      title: `Verify ${live.id}?`,
+      description: `Only verify after you have seen ${npr(live.amount)} (reference ${live.reference || "—"}) arrive in your ${live.method} account or statement. The order balance will be updated.`,
+      confirmLabel: "Yes, payment received", tone: "primary",
+    });
+    if (!ok) return;
     verifyTxn(live.id, true);
-    setStep(-1);
-    toast.success(`${live.id} verified. ${order?.number} updated.`);
+    toast.success(`${live.id} verified and order ${order?.number ?? ""} updated.`);
   };
   const reject = async () => {
     const ok = await confirm({ title: `Reject ${live.id}?`, description: "The transaction will be marked as failed and the order balance stays outstanding.", confirmLabel: "Reject payment" });
@@ -55,8 +55,8 @@ function Detail({ txn, onClose }: { txn: PaymentTxn | null; onClose: () => void 
     ["Order total status", order ? <Badge key="o" tone={PAY_TONE[order.paymentStatus]} dot>{order.paymentStatus}</Badge> : "—"], ["Order balance", order ? npr(orderBalance(order)) : "—"],
   ];
   return (
-    <Modal open onClose={onClose} title="Transaction details" description="Mock verification only — no payment provider is connected."
-      footer={live.status === "Pending" ? (<><Button onClick={onClose}>Close</Button><Button disabled={step >= 0} onClick={reject}><XCircle className="h-4 w-4" />Reject</Button><Button variant="primary" loading={step >= 0} onClick={verify}><ShieldCheck className="h-4 w-4" />Verify payment</Button></>) : <Button onClick={onClose}>Close</Button>}>
+    <Modal open onClose={onClose} title="Transaction details" description="Verify a payment only after the money has arrived in your account."
+      footer={live.status === "Pending" ? (<><Button onClick={onClose}>Close</Button><Button onClick={reject}><XCircle className="h-4 w-4" />Reject</Button><Button variant="primary" onClick={verify}><ShieldCheck className="h-4 w-4" />Verify payment</Button></>) : <Button onClick={onClose}>Close</Button>}>
       <div className="mb-4 flex items-center justify-between rounded-xl bg-a-subtle p-4">
         <div><p className="text-xs text-a-muted">Amount</p><p className="text-2xl font-semibold">{npr(live.amount)}</p></div>
         <Badge tone={TXN_TONE[live.status]} dot>{live.status}</Badge>
@@ -64,15 +64,6 @@ function Detail({ txn, onClose }: { txn: PaymentTxn | null; onClose: () => void 
       <dl className="divide-y divide-a-line text-sm">
         {rows.map(([k, v]) => <div key={k} className="flex justify-between gap-4 py-2"><dt className="text-a-muted">{k}</dt><dd className="text-right font-medium">{v}</dd></div>)}
       </dl>
-      {step >= 0 && (
-        <ul className="a-fade-in mt-4 space-y-2 rounded-lg border border-a-line p-3 text-sm" aria-live="polite">
-          {steps.map((s, i) => (
-            <li key={s} className={`flex items-center gap-2 ${i > step ? "text-a-muted/60" : ""}`}>
-              {i < step ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : i === step ? <Clock className="h-4 w-4 animate-pulse text-a-accent" /> : <span className="h-4 w-4" />}{s}
-            </li>
-          ))}
-        </ul>
-      )}
     </Modal>
   );
 }

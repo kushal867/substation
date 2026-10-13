@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { ExternalLink, Store, X } from "lucide-react";
+import { ExternalLink, LogOut, Store, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAdmin } from "../../store/AdminStore";
@@ -12,7 +12,7 @@ interface Props { collapsed: boolean; mobileOpen: boolean; onCloseMobile: () => 
 
 export function Sidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
   const pathname = usePathname();
-  const { state } = useAdmin();
+  const { state, signOut } = useAdmin();
   const { storeName, logo } = state.settings;
 
   const content = (compact: boolean) => (
@@ -72,6 +72,10 @@ export function Sidebar({ collapsed, mobileOpen, onCloseMobile }: Props) {
           <ExternalLink className="h-[18px] w-[18px] shrink-0" />
           {!compact && <span>View storefront</span>}
         </Link>
+        <button onClick={() => void signOut()} className={clsx("flex w-full items-center gap-3 rounded-lg py-2 text-sm text-slate-400 hover:bg-a-side-hover/70 hover:text-white", compact ? "justify-center" : "px-3")} aria-label="Sign out">
+          <LogOut className="h-[18px] w-[18px] shrink-0" />
+          {!compact && <span>Sign out</span>}
+        </button>
       </div>
     </div>
   );

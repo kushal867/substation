@@ -21,6 +21,7 @@ function useOverlay(open: boolean, onClose: () => void) {
     document.addEventListener("keydown", onKey);
     const t = setTimeout(() => {
       const el = ref.current;
+      if (el && el.contains(document.activeElement) && document.activeElement !== el) return; // user already started typing
       const first = el?.querySelector<HTMLElement>("[data-autofocus], input, select, textarea");
       (first ?? el)?.focus();
     }, 30);

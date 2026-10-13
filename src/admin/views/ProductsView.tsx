@@ -77,7 +77,7 @@ export default function ProductsView() {
     const names = state.products.filter((p) => ids.includes(p.id)).map((p) => p.name);
     const ok = await confirm({
       title: ids.length === 1 ? `Delete “${names[0]}”?` : `Delete ${ids.length} products?`,
-      description: "This removes the product and all of its variants from the catalogue and inventory. Past orders keep their line items. This can’t be undone (except by resetting demo data).",
+      description: "This removes the product and all of its variants from the catalogue and inventory. Past orders keep their line items. This can’t be undone.",
       confirmLabel: "Delete",
     });
     if (!ok) return;

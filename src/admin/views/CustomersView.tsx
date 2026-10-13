@@ -52,7 +52,7 @@ export default function CustomersView() {
 
   const flip = (c: Customer, paused: boolean) => {
     setBotPaused(c.id, paused);
-    toast.success(paused ? `Bot paused for ${c.name} (demo — no messages sent).` : `Bot resumed for ${c.name} (demo — no messages sent).`);
+    toast.success(paused ? `Bot paused for ${c.name} — the assistant will not reply to them until you resume it.` : `Bot resumed for ${c.name}.`);
   };
 
   const columns: Column<Row>[] = [
@@ -102,7 +102,7 @@ export default function CustomersView() {
             <section className="px-5 py-4">
               <div className="flex items-center justify-between gap-3 rounded-lg border border-a-line p-3">
                 <div className="flex items-start gap-3">{sel.botPaused ? <BotOff className="mt-0.5 h-5 w-5 text-amber-500" /> : <Bot className="mt-0.5 h-5 w-5 text-emerald-500" />}
-                  <div><p className="text-sm font-medium">{sel.botPaused ? "Bot paused" : "Bot replying"}</p><p className="text-xs text-a-muted">Demo toggle only — no real messages are sent or blocked.</p></div></div>
+                  <div><p className="text-sm font-medium">{sel.botPaused ? "Bot paused" : "Bot replying"}</p><p className="text-xs text-a-muted">Pausing stops the Messenger/Instagram assistant from replying to this customer.</p></div></div>
                 <Toggle checked={!sel.botPaused} label="Bot active" onChange={(on) => flip(sel, !on)} />
               </div>
             </section>

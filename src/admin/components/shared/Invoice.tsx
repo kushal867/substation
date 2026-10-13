@@ -62,7 +62,7 @@ export function Invoice({ order, customer, settings }: { order: Order; customer?
           <tr><td style={{ padding: "4px 6px", fontWeight: 700 }}>Balance due</td><td style={{ padding: "4px 6px", textAlign: "right", fontWeight: 700 }}>{npr(order.paymentStatus === "Refunded" || order.orderStatus === "Cancelled" ? 0 : Math.max(0, total - order.paid))}</td></tr>
         </tbody>
       </table>
-      <p style={{ marginTop: 48, fontSize: 11, color: "#777", textAlign: "center" }}>Thank you for shopping with {settings.storeName}. This is a computer-generated demo invoice.</p>
+      <p style={{ marginTop: 48, fontSize: 11, color: "#777", textAlign: "center" }}>Thank you for shopping with {settings.storeName}. This is a computer-generated invoice.</p>
     </div>
   );
 }

@@ -23,7 +23,7 @@ import { variantLabel, variantStatus } from "../lib/selectors";
 import { useAdmin } from "../store/AdminStore";
 
 export default function DashboardView() {
-  const { state, loadSampleData } = useAdmin();
+  const { state } = useAdmin();
   const dr = useDateRange(String(state.settings.defaultPeriod) as "30");
   const initial = usePageLoading();
   const switching = useBriefLoading(dr.range.from.getTime() + dr.range.to.getTime());
@@ -83,13 +83,12 @@ export default function DashboardView() {
       {storeEmpty && (
         <Card className="mb-5 border-dashed p-6">
           <h2 className="text-base font-semibold">Your store is empty — let&apos;s set it up</h2>
-          <p className="mt-1 text-sm text-a-muted">Add your first product, set delivery fees, then orders and payments will appear here.</p>
+          <p className="mt-1 text-sm text-a-muted">Add your first product and set delivery fees. Orders and payments from your Messenger/Instagram bot appear here automatically.</p>
           <ol className="mt-4 grid gap-3 sm:grid-cols-3">
             {[["1", "Review categories", "Shoes, Glasses and Bags are ready.", "/admin/categories"], ["2", "Add delivery zones", "Set fees per area.", "/admin/delivery-zones"], ["3", "Add a product", "With variants and stock.", "/admin/products?new=1"]].map(([n, t, d, h]) => (
               <li key={n}><Link href={h} className="flex h-full gap-3 rounded-lg border border-a-line p-3 transition-colors hover:bg-a-subtle"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-a-accent-soft text-xs font-semibold text-a-accent">{n}</span><span><span className="block text-sm font-medium">{t}</span><span className="text-xs text-a-muted">{d}</span></span></Link></li>
             ))}
           </ol>
-          <Button className="mt-4" variant="soft" onClick={() => { loadSampleData(); }}>Or explore with sample data</Button>
         </Card>
       )}
       <div className="mb-5"><DateRangeFilter state={dr} /></div>

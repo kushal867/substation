@@ -76,7 +76,7 @@ export default function ZonesView() {
         <Modal open size="sm" onClose={() => setDel(null)} title={`Delete “${del.name}”?`} footer={<><Button onClick={() => setDel(null)}>Cancel</Button><Button variant="danger" data-autofocus onClick={() => { deleteZone(del.id); toast.success(`Zone “${del.name}” deleted.`); setDel(null); }}>Delete zone</Button></>}>
           {n > 0 ? (
             <div className="flex gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-800 dark:text-amber-200"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /><p><strong>{n} order{n === 1 ? " is" : "s are"}</strong> linked to this zone. They keep their saved zone name and fee, but you won&apos;t be able to filter or ship new orders to it. Consider deactivating instead.</p></div>
-          ) : <p className="text-sm text-a-muted">No orders use this zone. This can&apos;t be undone (except by resetting demo data).</p>}
+          ) : <p className="text-sm text-a-muted">No orders use this zone. This can&apos;t be undone.</p>}
         </Modal>
       )}
     </>

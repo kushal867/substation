@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Database, LayoutDashboard, Monitor, Moon, Palette, RotateCcw, Save, Store, Sun, Upload, UserCog, Wallet } from "lucide-react";
+import { Bell, Database, LayoutDashboard, LogOut, Monitor, Moon, Palette, RotateCcw, Save, Store, Sun, Upload, UserCog, Wallet } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../components/ui/Button";
 import { Card, CardHeader } from "../components/ui/Card";
@@ -8,7 +8,7 @@ import { Field, SelectField, TextField, Toggle, inputCls } from "../components/u
 import { useConfirm, useToast } from "../components/ui/Feedback";
 import { PageHeader } from "../components/ui/Misc";
 import { usePageLoading } from "../hooks/usePageLoading";
-import { DEFAULT_SETTINGS } from "../data/seed";
+import { DEFAULT_SETTINGS } from "../data/defaults";
 import { useAdmin } from "../store/AdminStore";
 import type { Settings } from "../types";
 import clsx from "clsx";
@@ -52,7 +52,7 @@ function Row({ title, description, children }: { title: string; description?: st
 }
 
 export default function SettingsView() {
-  const { state, saveSettings, resetDemo, loadSampleData } = useAdmin();
+  const { state, saveSettings, signOut } = useAdmin();
   const toast = useToast();
   const confirm = useConfirm();
   usePageLoading(0);
@@ -77,7 +77,7 @@ export default function SettingsView() {
     const e: Record<string, string> = {};
     if (!d.storeName.trim()) e.storeName = "Store name is required.";
     if (!d.adminName.trim()) e.adminName = "Name is required.";
-    if (!/^\S+@\S+\.\S+$/.test(d.adminEmail)) e.adminEmail = "Enter a valid email address.";
+    if (d.adminEmail.trim() && !/^\S+@\S+\.\S+$/.test(d.adminEmail)) e.adminEmail = "Enter a valid email address.";
     if (!Number.isInteger(Number(d.lowStockThreshold)) || d.lowStockThreshold < 0 || d.lowStockThreshold > 1000) e.low = "Whole number between 0 and 1000.";
     setErr(e);
     if (Object.keys(e).length) return toast.error("Please fix the highlighted fields.");
@@ -90,20 +90,13 @@ export default function SettingsView() {
 
   const resetForm = () => { setD({ ...DEFAULT_SETTINGS }); setErr({}); toast.info("Form reset to defaults — click “Save changes” to apply."); };
 
-  const wipe = async () => {
-    const ok = await confirm({ title: "Clear all data?", description: "Products, orders, customers, payments, delivery zones and settings will be erased from this browser, leaving an empty store.", confirmLabel: "Clear all data" });
-    if (!ok) return;
-    resetDemo();
-    setD({ ...DEFAULT_SETTINGS });
-    toast.success("All data cleared. The store is now empty.");
-  };
 
-  const nav = [["store", "Store"], ["currency", "Currency"], ["inventory", "Inventory"], ["profile", "Profile"], ["dashboard", "Dashboard"], ["notifications", "Notifications"], ["theme", "Theme"], ["data", "Demo data"]];
+  const nav = [["store", "Store"], ["currency", "Currency"], ["inventory", "Inventory"], ["profile", "Profile"], ["dashboard", "Dashboard"], ["notifications", "Notifications"], ["theme", "Theme"], ["data", "Data & session"]];
   const themes: { v: Settings["theme"]; label: string; icon: React.ReactNode }[] = [{ v: "light", label: "Light", icon: <Sun className="h-4 w-4" /> }, { v: "dark", label: "Dark", icon: <Moon className="h-4 w-4" /> }, { v: "system", label: "System", icon: <Monitor className="h-4 w-4" /> }];
 
   return (
     <>
-      <PageHeader title="Settings" description="Preferences are stored in this browser only (demo)." />
+      <PageHeader title="Settings" description="Settings are saved to the database and apply to every admin." />
       <div className="grid gap-6 lg:grid-cols-[180px_minmax(0,1fr)]">
         <nav aria-label="Settings sections" className="hidden lg:block"><ul className="sticky top-24 space-y-0.5 text-sm">{nav.map(([id, l]) => <li key={id}><a href={`#${id}`} className="block rounded-lg px-3 py-1.5 text-a-muted hover:bg-a-subtle hover:text-a-fg">{l}</a></li>)}</ul></nav>
         <div className="space-y-5 pb-24">
@@ -122,7 +115,7 @@ export default function SettingsView() {
           </Section>
 
           <Section id="currency" icon={<Wallet />} title="Currency display" description="All amounts are displayed in Nepalese Rupees.">
-            <SelectField label="Currency" value={d.currency} onChange={() => undefined} hint="Only NPR is available in this demo."><option value="NPR">NPR — Nepalese Rupee (NPR 12,500)</option></SelectField>
+            <SelectField label="Currency" value={d.currency} onChange={() => undefined} hint="All prices are shown in Nepalese Rupees."><option value="NPR">NPR — Nepalese Rupee (NPR 12,500)</option></SelectField>
           </Section>
 
           <Section id="inventory" icon={<Database />} title="Inventory" description="Defaults used across inventory, products and dashboard alerts.">
@@ -132,10 +125,10 @@ export default function SettingsView() {
           <Section id="profile" icon={<UserCog />} title="Admin profile" description="Shown in the header and on internal notes.">
             <div className="grid gap-4 sm:grid-cols-2">
               <TextField label="Full name" required value={d.adminName} onChange={(e) => set("adminName", e.target.value)} error={err.adminName} />
-              <TextField label="Email" type="email" required value={d.adminEmail} onChange={(e) => set("adminEmail", e.target.value)} error={err.adminEmail} />
+              <TextField label="Email" type="email" value={d.adminEmail} onChange={(e) => set("adminEmail", e.target.value)} error={err.adminEmail} />
               <TextField label="Role" value={d.adminRole} onChange={(e) => set("adminRole", e.target.value)} />
             </div>
-            <p className="text-xs text-a-muted">No passwords or credentials are collected or stored.</p>
+            
           </Section>
 
           <Section id="dashboard" icon={<LayoutDashboard />} title="Dashboard preferences" description="Defaults for charts and tables.">
@@ -151,7 +144,6 @@ export default function SettingsView() {
             <Row title="Low-stock alerts"><Toggle checked={d.notifyLowStock} onChange={(v) => set("notifyLowStock", v)} label="Low stock alerts" /></Row>
             <Row title="New orders"><Toggle checked={d.notifyNewOrder} onChange={(v) => set("notifyNewOrder", v)} label="New order alerts" /></Row>
             <Row title="Payments awaiting verification"><Toggle checked={d.notifyPayment} onChange={(v) => set("notifyPayment", v)} label="Payment alerts" /></Row>
-            <SelectField label="Email digest (demo)" value={d.notifyDigest} onChange={(e) => set("notifyDigest", e.target.value as Settings["notifyDigest"])} className="max-w-48"><option value="off">Off</option><option value="daily">Daily</option><option value="weekly">Weekly</option></SelectField>
           </Section>
 
           <Section id="theme" icon={<Palette />} title="Theme" description="Choose how the admin looks.">
@@ -162,9 +154,8 @@ export default function SettingsView() {
             </div>
           </Section>
 
-          <Section id="data" icon={<Database />} title="Demo data" description="Data lives in localStorage on this device only.">
-            <Row title="Load sample data" description="Fill the store with realistic mock products, orders, customers and payments."><Button size="sm" onClick={async () => { const ok = await confirm({ title: "Load sample data?", description: "This replaces everything currently in the admin with mock records.", confirmLabel: "Load sample data", tone: "primary" }); if (!ok) return; loadSampleData(); toast.success("Sample data loaded."); }}>Load sample</Button></Row>
-            <Row title="Clear all data" description="Erase every record and start with an empty store."><Button variant="danger" size="sm" onClick={wipe}><RotateCcw className="h-3.5 w-3.5" />Clear all</Button></Row>
+          <Section id="data" icon={<Database />} title="Data & session" description="All data is stored in your PostgreSQL database and shared with the n8n automations.">
+            <Row title="Sign out" description="End this admin session on this browser."><Button size="sm" onClick={signOut}><LogOut className="h-3.5 w-3.5" />Sign out</Button></Row>
           </Section>
         </div>
       </div>
