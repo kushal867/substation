@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Bodoni_Moda, Inter } from "next/font/google";
 import "./globals.css";
-import Providers from "./providers";
 
 const serif = Bodoni_Moda({
   variable: "--font-serif",
@@ -29,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${serif.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink">
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );
