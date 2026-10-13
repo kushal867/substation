@@ -7,7 +7,8 @@ CREATE TABLE customers (
   platform_id   text NOT NULL,                 -- PSID / IGSID
   name          text,
   phone_number  text,
-  bot_paused    boolean NOT NULL DEFAULT false, -- owner chatting manually
+  bot_paused    boolean NOT NULL DEFAULT false, -- manual pause (indefinite)
+  bot_paused_until timestamptz,                 -- auto pause after the owner replies in the page inbox
   last_seen_at  timestamptz,
   created_at    timestamptz NOT NULL DEFAULT now(),
   UNIQUE (platform, platform_id)
