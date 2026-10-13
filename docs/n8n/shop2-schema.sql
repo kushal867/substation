@@ -105,3 +105,16 @@ CREATE TABLE payments (
   reference  text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+
+-- ---------------------------------------------------------------------------
+-- Migrating an EXISTING database (skip on a fresh install):
+-- run once BEFORE activating "Shop2 - Order Status Notifier", otherwise it
+-- treats every old order as a new status change and tries to message all customers.
+--   ALTER TABLE orders ADD COLUMN notified_status text NOT NULL DEFAULT 'Pending';
+--   ALTER TABLE orders ADD COLUMN reminder_count integer NOT NULL DEFAULT 0;
+--   ALTER TABLE orders ADD COLUMN last_reminder_at timestamptz;
+--   UPDATE orders SET notified_status = status, reminder_count = 3;  -- old orders: no nagging
+--   ALTER TABLE customers ADD COLUMN page_id text;
+--   ALTER TABLE customers ADD COLUMN bot_paused_until timestamptz;
+--   ALTER TABLE product_variants ADD COLUMN low_alert_sent boolean NOT NULL DEFAULT false;
+-- ---------------------------------------------------------------------------
