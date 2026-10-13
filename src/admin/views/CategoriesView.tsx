@@ -122,7 +122,7 @@ function DeleteCategory({ cat, count, onClose }: { cat: Category; count: number;
             </SelectField>
           ) : <p className="text-sm text-a-muted">There is no other category, so the products will become “Uncategorized”.</p>}
         </div>
-      ) : <p className="text-sm text-a-muted">This category is empty. This action can’t be undone (except by resetting demo data).</p>}
+      ) : <p className="text-sm text-a-muted">This category is empty. This action can’t be undone.</p>}
     </Modal>
   );
 }

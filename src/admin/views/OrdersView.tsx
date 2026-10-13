@@ -64,14 +64,14 @@ function OrderDrawer({ orderId, onClose }: { orderId: string | null; onClose: ()
   };
 
   const verify = async () => {
-    const ok = await confirm({ title: "Verify payment?", description: pendingTxns.length ? `Confirm ${pendingTxns.length} pending transaction${pendingTxns.length > 1 ? "s" : ""} totalling ${npr(pendingTxns.reduce((s, t) => s + t.amount, 0))}. (Mock verification — no payment provider is contacted.)` : `Record ${npr(balance)} as received and verified for ${order.number}. (Mock verification.)`, confirmLabel: "Mark verified", tone: "primary" });
+    const ok = await confirm({ title: "Verify payment?", description: pendingTxns.length ? `Check the amount in your wallet/bank app first, then confirm ${pendingTxns.length} pending transaction${pendingTxns.length > 1 ? "s" : ""} totalling ${npr(pendingTxns.reduce((s, t) => s + t.amount, 0))}.` : `Record ${npr(balance)} as received and verified for ${order.number}.`, confirmLabel: "Mark verified", tone: "primary" });
     if (!ok) return;
     const res = verifyOrderPayment(order.id);
     res.ok ? toast.success(res.message) : toast.error(res.message);
   };
 
   const refund = async () => {
-    const ok = await confirm({ title: "Refund payment?", description: `${npr(order.paid)} will be marked as refunded to the customer. This is a demo action — no money moves.`, confirmLabel: "Refund" });
+    const ok = await confirm({ title: "Refund payment?", description: `${npr(order.paid)} will be marked as refunded to the customer. This only records the refund here — send the money back from your wallet or bank app.`, confirmLabel: "Refund" });
     if (!ok) return;
     refundOrder(order.id);
     toast.success(`${npr(order.paid)} refunded for ${order.number}.`);

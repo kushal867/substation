@@ -87,18 +87,29 @@ the array `imagesFor()` returns.
 
 ## Admin panel (`/admin`)
 
-A frontend-only e-commerce admin built into this app: Dashboard, Products (with
-variants), Categories, Inventory, Orders (detail drawer + printable invoice),
-Payments (mock verification), Delivery Zones, Customers, Analytics (CSV export +
-printable report) and Settings (theme, thresholds, reset demo data).
+Production admin backed by PostgreSQL, behind a password login: Dashboard,
+Products (with variants), Categories, Inventory, Orders (detail drawer +
+printable invoice), Payments (verification), Delivery Zones, Customers,
+Analytics (CSV export + printable report) and Settings. There is no sample
+data: a fresh install is empty and shows only what is in your database
+(including orders written by the n8n bot).
 
-- Open [http://localhost:3000/admin](http://localhost:3000/admin) after `npm run dev`.
-- No backend, database, auth or payment provider: all data is mock data from
-  `src/admin/data/seed.ts` (loaded on demand), held in a shared React store
-  (`src/admin/store/AdminStore.tsx`) so edits propagate to every page.
-- Demo changes persist in this browser's `localStorage` (key
-  `substation-admin-demo-v2`, no sensitive data). The admin starts empty; use
-  **Settings → Load sample data** for mock records or **Clear all data** to wipe.
-- Layout: `src/admin/{components,views,hooks,lib,data,store}`; routes live in
-  `src/app/admin`. The storefront moved into the `(store)` route group so the
-  admin has its own layout without the storefront navbar/footer.
+### Deploy (admin only)
+
+Requirements: Node 20+, PostgreSQL 14+.
+
+1. `cp .env.example .env.local` and fill in:
+   - `DATABASE_URL` – e.g. `postgres://user:pass@127.0.0.1:5432/shop`
+   - `SESSION_SECRET` – 32+ random chars (`openssl rand -hex 32`)
+   - `ADMIN_PASSWORD_HASH` – output of `npm run admin:hash -- 'your password'`
+2. `npm run db:apply` – creates the tables/triggers (idempotent, safe to re-run).
+3. `npm run build && npm run start` (port 3000) behind your HTTPS reverse
+   proxy (nginx/Caddy). Cookies are `Secure` in production; set
+   `INSECURE_COOKIES=1` only for plain-HTTP testing.
+4. Open `https://your-domain/admin` and sign in.
+
+Notes: sign-in is rate limited (5 attempts / 15 min per IP); API routes
+(`/api/admin/*`) return 401 without a session. Schema: `db/schema.sql`.
+Layout: `src/admin` (UI), `src/server` (DB, auth, commands), `src/proxy.ts`
+(auth gate). The storefront (`(store)` route group) still uses its own static
+catalog in `src/lib/products.ts`.

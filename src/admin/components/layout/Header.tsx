@@ -126,7 +126,7 @@ function GlobalSearch() {
 
 export function Header({ collapsed, onToggle, onOpenMobile }: Props) {
   const pathname = usePathname();
-  const { state, markNotificationsRead } = useAdmin();
+  const { state, markNotificationsRead, signOut } = useAdmin();
   const toast = useToast();
   const router = useRouter();
   const notifs = useNotifications();
@@ -216,7 +216,7 @@ export function Header({ collapsed, onToggle, onOpenMobile }: Props) {
             { label: "Admin profile", icon: <User />, onClick: () => router.push("/admin/settings#profile") },
             { label: "Settings", icon: <Settings />, onClick: () => router.push("/admin/settings") },
             { label: "View storefront", icon: <Store />, onClick: () => window.open("/", "_blank") },
-            { label: "Sign out (demo)", icon: <LogOut />, danger: true, divider: true, onClick: () => toast.info("This is a frontend demo — there is no authentication to sign out of.") },
+            { label: "Sign out", icon: <LogOut />, danger: true, divider: true, onClick: () => void signOut() },
           ]}
         />
       </div>

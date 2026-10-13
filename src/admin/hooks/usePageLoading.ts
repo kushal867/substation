@@ -1,11 +1,5 @@
-import { useEffect, useState } from "react";
-
-/** Brief skeleton state on page entry — gives loading-style feedback for the mock data. */
-export function usePageLoading(ms = 350) {
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const t = setTimeout(() => setLoading(false), ms);
-    return () => clearTimeout(t);
-  }, [ms]);
-  return loading;
+/** Data is loaded before any page renders (see AdminShell), so pages never need an artificial loading state. */
+export function usePageLoading(_ms?: number) {
+  void _ms;
+  return false;
 }
