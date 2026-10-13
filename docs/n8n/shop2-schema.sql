@@ -9,7 +9,8 @@ CREATE TABLE customers (
   phone_number  text,
   bot_paused    boolean NOT NULL DEFAULT false, -- manual pause (indefinite)
   bot_paused_until timestamptz,                 -- auto pause after the owner replies in the page inbox
-  last_seen_at  timestamptz,
+  page_id       text,                          -- Facebook page id (or Instagram account id) the customer wrote to
+  last_seen_at  timestamptz,                   -- last inbound message; used for Meta's 24h window
   created_at    timestamptz NOT NULL DEFAULT now(),
   UNIQUE (platform, platform_id)
 );
@@ -41,7 +42,8 @@ CREATE TABLE product_variants (
   color      text,
   price_npr  numeric,                           -- NULL = use product base price
   stock_qty  integer NOT NULL DEFAULT 0 CHECK (stock_qty >= 0),
-  available  boolean NOT NULL DEFAULT true
+  available  boolean NOT NULL DEFAULT true,
+  low_alert_sent boolean NOT NULL DEFAULT false  -- low-stock Telegram alert already sent
 );
 
 CREATE TABLE delivery_zones (
@@ -75,6 +77,9 @@ CREATE TABLE orders (
   total          numeric NOT NULL,
   advance_amount numeric NOT NULL DEFAULT 0,
   paid_amount    numeric NOT NULL DEFAULT 0,     -- only verified payments
+  notified_status text NOT NULL DEFAULT 'Pending', -- last status the customer was told about
+  reminder_count integer NOT NULL DEFAULT 0,     -- unpaid-order reminders sent (3 = cancelled)
+  last_reminder_at timestamptz,
   status         text NOT NULL DEFAULT 'Pending',
   payment_status text NOT NULL DEFAULT 'Unpaid',
   created_at     timestamptz NOT NULL DEFAULT now()
