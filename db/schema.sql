@@ -231,3 +231,47 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS variants_log_movement ON product_variants;
 CREATE TRIGGER variants_log_movement AFTER UPDATE OF stock_qty ON product_variants
   FOR EACH ROW EXECUTE FUNCTION log_stock_movement();
+
+-- ----------------------------------------------------------------------------
+-- Facebook post -> product link, and the comment auto-reply log.
+-- post_products is filled when a product photo is published from Telegram (or
+-- by hand); the n8n comment poller reads it to answer "price?" / "delivery?".
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS post_products (
+  id          bigserial PRIMARY KEY,
+  page_id     text NOT NULL,                       -- Facebook page id
+  post_id     text,                                -- feed post id ("<page>_<post>")
+  video_id    text,                                -- id returned when a video is published
+  ig_media_id text,
+  product_id  bigint REFERENCES products(id) ON DELETE SET NULL,
+  name        text NOT NULL,
+  category    text NOT NULL DEFAULT '',
+  price_npr   numeric,                             -- NULL = owner did not write a price
+  sizes       text[] NOT NULL DEFAULT '{}',
+  colors      text[] NOT NULL DEFAULT '{}',
+  tags        text[] NOT NULL DEFAULT '{}',
+  caption     text NOT NULL DEFAULT '',
+  image_url   text,
+  source      text NOT NULL DEFAULT 'telegram',
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS post_products_page_post_idx  ON post_products (page_id, post_id);
+CREATE INDEX IF NOT EXISTS post_products_page_video_idx ON post_products (page_id, video_id);
+
+CREATE TABLE IF NOT EXISTS post_comments (
+  comment_id         text PRIMARY KEY,             -- Facebook comment id (claimed once, so never answered twice)
+  page_id            text NOT NULL,
+  post_id            text NOT NULL,
+  commenter_id       text,
+  commenter_name     text,
+  message            text NOT NULL,
+  intent             text,
+  status             text NOT NULL DEFAULT 'new'
+                     CHECK (status IN ('new', 'replied', 'escalated', 'skipped', 'failed')),
+  reply_text         text,
+  private_reply_sent boolean NOT NULL DEFAULT false,
+  comment_created_at timestamptz,
+  created_at         timestamptz NOT NULL DEFAULT now(),
+  handled_at         timestamptz
+);
+CREATE INDEX IF NOT EXISTS post_comments_status_idx ON post_comments (status, created_at DESC);
